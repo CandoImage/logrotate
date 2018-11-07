@@ -26,7 +26,8 @@ RUN export CONTAINER_USER=logrotate && \
     tar xvf /tmp/go-cron.tar.gz -C /usr/bin && \
     apk del \
       wget && \
-    rm -rf /var/cache/apk/* && rm -rf /tmp/*
+    rm -rf /var/cache/apk/* && rm -rf /tmp/* && \
+    chown logrotate:logrotate /logrotate-status
 
 # environment variable for this container
 ENV LOGROTATE_OLDDIR= \
