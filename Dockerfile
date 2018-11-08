@@ -27,6 +27,7 @@ RUN export CONTAINER_USER=logrotate && \
     apk del \
       wget && \
     rm -rf /var/cache/apk/* && rm -rf /tmp/* && \
+    mkdir -p /logrotate-status && \
     chown logrotate:logrotate /logrotate-status
 
 # environment variable for this container
