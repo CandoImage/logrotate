@@ -1,32 +1,41 @@
-FROM blacklabelops/alpine:3.8
-MAINTAINER Steffen Bleul <sbl@blacklabelops.com>
+FROM alpine
+LABEL MAINTAINER="Greg White <grewhit23@gmail.com>"
 
 # logrotate version (e.g. 3.9.1-r0)
 ARG LOGROTATE_VERSION=latest
 # permissions
 ARG CONTAINER_UID=1000
 ARG CONTAINER_GID=1000
+ENV GOPATH /usr/bin
 
 # install dev tools
 RUN export CONTAINER_USER=logrotate && \
     export CONTAINER_GROUP=logrotate && \
     addgroup -g $CONTAINER_GID logrotate && \
     adduser -u $CONTAINER_UID -G logrotate -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
-    apk add --update \
-      tar \
-      gzip \
-      wget \
+    apk add --update && \
+    apk add --virtual build-dependencies \
+      go gcc g++ wget git tar gzip && \
+    apk add \
+      bash \
+      tini \
       tzdata && \
     if  [ "${LOGROTATE_VERSION}" = "latest" ]; \
       then apk add logrotate ; \
       else apk add "logrotate=${LOGROTATE_VERSION}" ; \
     fi && \
     mkdir -p /usr/bin/logrotate.d && \
-    wget --no-check-certificate -O /tmp/go-cron.tar.gz https://github.com/michaloo/go-cron/releases/download/v0.0.2/go-cron.tar.gz && \
-    tar xvf /tmp/go-cron.tar.gz -C /usr/bin && \
-    apk del \
-      wget && \
-    rm -rf /var/cache/apk/* && rm -rf /tmp/*
+    cd ${GOPATH} && \
+    mkdir -p src/github.com/odise/ && \
+    cd src/github.com/odise && \
+    git clone https://github.com/odise/go-cron.git && \
+    cd go-cron && \
+    go get -d && \
+    go build -o /usr/bin/go-cron -ldflags "-X main.build=`git rev-parse --short HEAD`" bin/go-cron.go && \
+    apk del build-dependencies && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf ${GOPATH}/src && \
+    rm -rf /tmp/*
 
 # environment variable for this container
 ENV LOGROTATE_OLDDIR= \
@@ -42,11 +51,7 @@ ENV LOGROTATE_OLDDIR= \
     LOGROTATE_STATUSFILE= \
     LOG_FILE=
 
-COPY docker-entrypoint.sh /usr/bin/logrotate.d/docker-entrypoint.sh
-COPY update-logrotate.sh /usr/bin/logrotate.d/update-logrotate.sh
-COPY logrotate.sh /usr/bin/logrotate.d/logrotate.sh
-COPY logrotateConf.sh /usr/bin/logrotate.d/logrotateConf.sh
-COPY logrotateCreateConf.sh /usr/bin/logrotate.d/logrotateCreateConf.sh
+COPY *.sh /usr/bin/logrotate.d/
 
 ENTRYPOINT ["/sbin/tini","--","/usr/bin/logrotate.d/docker-entrypoint.sh"]
 VOLUME ["/logrotate-status"]

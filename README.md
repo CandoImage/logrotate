@@ -1,5 +1,15 @@
 # Dockerized Logrotate
 
+This is a fork from [blacklableops repo](https://github.com/blacklabelops/logrotate).
+go-cron compiled from [odise repo](https://github.com/odise/go-cron).
+
+```text
+Simple golang wrapper over github.com/robfig/cron and os/exec as a cron replacement. Additionally the application opens a HTTP port that can be used as a healthcheck.
+
+usage
+go-cron -s "* * * * * *" -p 18080 -- /bin/bash -c "echo 1"
+```
+
 [![Open Issues](https://img.shields.io/github/issues/blacklabelops/logrotate.svg)](https://github.com/blacklabelops/logrotate/issues) [![Stars on GitHub](https://img.shields.io/github/stars/blacklabelops/logrotate.svg)](https://github.com/blacklabelops/logrotate/stargazers)
 [![Docker Stars](https://img.shields.io/docker/stars/blacklabelops/logrotate.svg)](https://hub.docker.com/r/blacklabelops/logrotate/) [![Docker Pulls](https://img.shields.io/docker/pulls/blacklabelops/logrotate.svg)](https://hub.docker.com/r/blacklabelops/logrotate/) [![](https://badge.imagelayers.io/blacklabelops/logrotate:latest.svg)](https://imagelayers.io/?images=blacklabelops/logrotate:latest 'Get your own badge on imagelayers.io')
 
@@ -16,6 +26,8 @@ backup volumes.
 ## Make It Short
 
 In short, this container can rotate all your Docker logfiles just by typing:
+
+add -p 18080:18080 if not running in host mode
 
 ~~~~
 $ docker run -d \
@@ -424,6 +436,23 @@ $ docker run -d \
 ~~~~
 
 > This will logrotate in Australia/Melbourne time zone.
+
+## Health Check
+
+```text
+$ curl localhost:18080
+{
+  "Running": {},
+  "Last": {
+    "Exit_status": 0,
+    "Stdout": "",
+    "Stderr": "",
+    "ExitTime": "",
+    "Pid": 0,
+    "StartingTime": ""
+  },
+  "Schedule": "1 0 0 * * *"
+```
 
 ## Used in Kubernetes
 

@@ -1,5 +1,4 @@
-.git
-scripts
-README.md
-.vagrant
-logs
+*
+!Dockerfile
+!LICENCE
+!*.sh
