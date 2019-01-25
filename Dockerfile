@@ -52,6 +52,7 @@ ENV LOGROTATE_OLDDIR= \
     LOG_FILE=
 
 COPY *.sh /usr/bin/logrotate.d/
+RUN  chmod 755 /usr/bin/logrotate.d/*.sh
 
 ENTRYPOINT ["/sbin/tini","--","/usr/bin/logrotate.d/docker-entrypoint.sh"]
 VOLUME ["/logrotate-status"]
