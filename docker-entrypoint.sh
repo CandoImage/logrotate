@@ -73,11 +73,11 @@ logrotate_cron_timetable="/usr/sbin/logrotate ${logrotate_parameters} --state=${
 
 if [ "$1" = 'cron' ]; then
   if [ ${logrotate_autoupdate} = "true" ]; then
-    exec /usr/bin/go-cron "${logrotate_croninterval}" /bin/bash -c "/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
+    exec /usr/bin/go-cron -s "${logrotate_croninterval}" -p 18080 -- /bin/bash -c "/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
     exit
   fi
 
-  exec /usr/bin/go-cron "${logrotate_croninterval}" /bin/bash -c "${logrotate_cron_timetable}"
+  exec /usr/bin/go-cron -s "${logrotate_croninterval}" -p 18080 -- /bin/bash -c "${logrotate_cron_timetable}"
 fi
 
 #-----------------------
